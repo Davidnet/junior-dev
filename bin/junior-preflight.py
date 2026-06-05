@@ -20,7 +20,7 @@ def main():
         return 1
     if not models:
         print(f"junior-dev: Ollama is up at {host()} but no models are installed.")
-        print("  Pull one, e.g. 'ollama pull gemma2:9b', then set JUNIOR_MODEL.")
+        print("  Pull one, e.g. 'ollama pull gemma4:12b', then set JUNIOR_MODEL.")
         return 1
     using = os.environ.get("JUNIOR_MODEL") or f"{models[0]}  (auto: first model)"
     print(f"junior-dev: ready. Host={host()}")

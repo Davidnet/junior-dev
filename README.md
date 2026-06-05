@@ -19,7 +19,7 @@ expensive Claude-side retries.
 
 ## Requirements
 - [Ollama](https://ollama.com) running locally (`ollama serve`)
-- At least one model pulled (e.g. `ollama pull gemma2:9b`)
+- At least one model pulled (e.g. `ollama pull gemma4:12b`)
 - `python3` (standard library only — no `pip install`, no `curl`)
 
 ## Install
@@ -45,7 +45,7 @@ to confirm. Or invoke it explicitly:
 
 Set them in your shell profile, e.g.:
 ```
-export JUNIOR_MODEL=gemma2:9b
+export JUNIOR_MODEL=gemma4:12b
 ```
 
 ## How it works
