@@ -39,8 +39,13 @@ check you'll verify it with, then ask for a quick OK. Do not delegate silently.
 
 ## 3. Preflight
 
-Run `junior-preflight.py`. If Ollama is unreachable or has no model, tell the
-user and just do the task yourself.
+Run the preflight check. Resolve the script path at call time so it works on any
+Claude Code version (whether or not the plugin's `bin/` is on PATH):
+
+    python3 "$(command -v junior-preflight.py 2>/dev/null || find ~/.claude/plugins/cache -name junior-preflight.py 2>/dev/null | head -1)"
+
+If Ollama is unreachable or has no model, tell the user and just do the task
+yourself.
 
 ## 4. Write a tight spec
 
@@ -50,16 +55,18 @@ it fully self-contained.
 
 ## 5. Delegate
 
-    printf '%s' "$SPEC" | junior-delegate.py
+    printf '%s' "$SPEC" | python3 "$(command -v junior-delegate.py 2>/dev/null || find ~/.claude/plugins/cache -name junior-delegate.py 2>/dev/null | head -1)"
 
-Returns clean code on stdout (thinking block and ``` fences already stripped).
+(The `command -v … || find …` resolves the script whether or not `bin/` is on
+PATH.) Returns clean code on stdout (thinking block and ``` fences already
+stripped).
 
 **Decide thinking per task.** Local thinking tokens are ~free (just latency), and
 a better first pass means fewer expensive Claude-side retries:
 - Pure boilerplate / mechanical → leave thinking off (default).
 - Any real logic, edge cases, or correctness nuance → prefix with `JUNIOR_THINK=1`:
 
-      printf '%s' "$SPEC" | JUNIOR_THINK=1 junior-delegate.py
+      printf '%s' "$SPEC" | JUNIOR_THINK=1 python3 "$(command -v junior-delegate.py 2>/dev/null || find ~/.claude/plugins/cache -name junior-delegate.py 2>/dev/null | head -1)"
 
 Config via env: `JUNIOR_MODEL` (default: first installed model), `OLLAMA_HOST`
 (default http://localhost:11434), `JUNIOR_TEMP` (default 0).

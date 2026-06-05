@@ -72,11 +72,12 @@ export JUNIOR_THINK=0                       # 1 = always let the model reason fi
 
 ## 3. Check the local model is reachable
 
-The plugin ships a preflight script. From a Claude Code Bash call (or a normal
-terminal with the plugin's `bin/` on `PATH`):
+The plugin ships a preflight script. From a normal terminal, run it with
+`python3` from the cloned repo (bare `junior-preflight.py` only resolves inside
+Claude Code's own Bash tool, and only on recent versions — not your shell):
 
 ```bash
-junior-preflight.py
+python3 bin/junior-preflight.py
 ```
 
 Expected:
@@ -153,15 +154,16 @@ deliberately conservative; junior tasks only.
 
 ## 7. Try the manual pipeline directly (no Claude needed)
 
-You can drive the delegate script yourself to feel the raw round-trip:
+You can drive the delegate script yourself to feel the raw round-trip (run from
+the cloned repo):
 
 ```bash
 printf '%s' "Write a Python function is_even(n) returning a bool. Return ONLY code." \
-  | junior-delegate.py
+  | python3 bin/junior-delegate.py
 
 # Let the model reason first (free locally; better first pass on logic):
 printf '%s' "Write a Python function that returns the nth Fibonacci number iteratively. Return ONLY code." \
-  | JUNIOR_THINK=1 junior-delegate.py
+  | JUNIOR_THINK=1 python3 bin/junior-delegate.py
 ```
 
 Expected: clean code on stdout — no markdown fences, no reasoning text.
@@ -177,7 +179,7 @@ Stop Ollama and confirm graceful degradation:
 ```bash
 ollama stop gemma4:12b 2>/dev/null; pkill -f "ollama serve" 2>/dev/null
 
-junior-preflight.py   # should report NOT reachable, exit non-zero
+python3 bin/junior-preflight.py   # should report NOT reachable, exit non-zero
 ```
 
 In Claude Code, a junior task should now make Claude notice the local model is
@@ -193,6 +195,6 @@ Restart with `ollama serve &` when done.
 |---|---|
 | `Ollama NOT reachable` | `ollama serve` is not running, or `OLLAMA_HOST` is wrong |
 | `no model available` | `ollama pull gemma4:12b`, or set `JUNIOR_MODEL` |
-| `junior-delegate.py: command not found` | Reload Claude Code so the plugin's `bin/` is on `PATH`; or call it by full path |
+| `junior-delegate.py: command not found` | The `bin/`-on-PATH feature is Claude-Bash-tool-only and recent. In a plain shell run `python3 bin/junior-delegate.py` from the repo. Inside Claude Code, reload after install; the skill also falls back to globbing `~/.claude/plugins/cache`. |
 | Permission prompts every call | The bundled allowlist may need confirming once; approve it |
 | Output has ` ``` ` fences or reasoning text | File an issue — `clean()` in `lib/junior_ollama.py` should strip these |
